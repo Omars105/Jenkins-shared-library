@@ -1,0 +1,69 @@
+#!/usr/bin/env groovy
+
+/**
+ * Example Jenkinsfile — how to USE this shared library from any project.
+ *
+ * STEP 1: Register the library in Jenkins:
+ *   Manage Jenkins → Configure System → Global Pipeline Libraries
+ *   Name: jenkins-shared-lib
+ *   Default Version: main
+ *   Source: Git → https://github.com/your-org/jenkins-shared-lib.git
+ *
+ * STEP 2: Use it in your project's Jenkinsfile (two options below)
+ */
+
+// ─────────────────────────────────────────────────────────
+// OPTION A: Use the full myPipeline() wrapper (simplest)
+// ─────────────────────────────────────────────────────────
+@Library('jenkins-shared-lib') _
+
+myPipeline(
+    appName:        'my-java-service',
+    dockerRegistry: 'myrepo',       // e.g. docker.io/myusername
+    buildTool:      'Maven',         // or 'Gradle'
+    branch:         'main',          // branch to build Docker image on
+    imageTag:       env.BUILD_NUMBER
+)
+
+
+// ─────────────────────────────────────────────────────────
+// OPTION B: Use individual steps for more control
+// ─────────────────────────────────────────────────────────
+/*
+@Library('jenkins-shared-lib') _
+import org.example.PipelineUtils
+import org.example.DockerUtils
+
+def utils   = new PipelineUtils(this)
+def docker  = new DockerUtils(this)
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    utils.printBanner("Starting Build")
+                    buildJava(tool: 'Maven', goals: 'clean package -DskipTests')
+                }
+            }
+        }
+
+        stage('Docker') {
+            steps {
+                script {
+                    def tag = utils.generateImageTag()
+                    docker.login('my-dockerhub-creds')
+                    dockerBuild(imageName: 'my-app', imageTag: tag, registry: 'myrepo')
+                }
+            }
+        }
+    }
+
+    post {
+        success { notify(status: 'SUCCESS') }
+        failure { notify(status: 'FAILURE') }
+    }
+}
+*/

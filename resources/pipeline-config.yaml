@@ -1,0 +1,34 @@
+config:
+  # App metadata used in pipeline steps
+  appName: my-java-service
+  version: 1.0.0
+
+build:
+  tool: Maven          # Maven | Gradle
+  goals: clean package -DskipTests
+  javaVersion: '17'
+
+docker:
+  registry: myrepo     # e.g. docker.io/myusername or gcr.io/my-project
+  imageName: my-java-service
+  dockerfile: Dockerfile
+
+notifications:
+  slack:
+    channel: '#jenkins'
+    enabled: true
+  email:
+    to: team@example.com
+    enabled: false
+
+environments:
+  dev:
+    branch: develop
+    autoDeployEnabled: true
+  staging:
+    branch: release/*
+    autoDeployEnabled: false
+  prod:
+    branch: main
+    autoDeployEnabled: false
+    requiresApproval: true
