@@ -10,7 +10,7 @@
  *   buildJava(tool: 'Gradle', goals: 'clean build')
  */
 def call() {
-  echo "Build java"
+  echo "Build java for branch $BRANCH_NAME"
   sh 'mvn package'
 }
 
