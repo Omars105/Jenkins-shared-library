@@ -13,7 +13,7 @@ class Docker implements Serializable {
         script.echo 'Building the docker image...'
         script.sh "docker build -t $imageName ." 
     }
-}
+
 
 
 def dockerlogin() {
@@ -30,3 +30,4 @@ def dockerpush(String imageName) {
 }
 
 
+}
